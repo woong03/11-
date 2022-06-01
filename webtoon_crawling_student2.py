@@ -1,10 +1,5 @@
-from openpyxl import Workbook,load_workbook
-import openpyxl
 import requests
 from bs4 import BeautifulSoup
-
-wb = openpyxl.Workbook()
-sheet = wb.active()
 
 title = [[], [], [], [], [], [], []]
 title_today = []
@@ -16,6 +11,7 @@ res.raise_for_status()
 soup = BeautifulSoup(res.text, "lxml")
 day = soup.find_all("div", attrs={"class":"col "})
 today = soup.find_all("div", attrs={"class":"col col_selected"})
+img = soup.find_all(class_='_img')
 d = 0
 for i in day:
   aday = i.find_all("ul")
@@ -34,6 +30,19 @@ for k in today:
 
 print(f"today:{title_today}")
 for i in range(6):
-  sheet.append(title[i])
+  title[i]
   
-wb.save("naverwebtoon_crawler.xlsx")
+n = 1
+for i in img:
+    print(n)
+    imgUrl = i['data-source']
+    with urlopen(imgUrl) as f:
+        with open('./images/img' + str(n)+'.jpg','wb') as h: # w - write b - binary
+            img = f.read()
+            h.write(img)
+    n += 1
+    if n > crawl_num:
+        break
+    
+    
+print('Image Crawling is done.')
